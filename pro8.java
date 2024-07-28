@@ -1,33 +1,48 @@
-Import java.sql.*;
+import java.sql.*;
+import java.util.Scanner;
 
-Public class GetDesignation {
-    Public static void main(String[] args) {
-        // Database connection settings
-        String dbUrl = “jdbc:mysql://localhost:3306/your_database”;
-        String username = “your_username”;
-        String password = “your_password”;
+class pro8 
+{
+    public static void main(String[] args) 
+    {
+        Connection conn = null;
+        CallableStatement cst = null;
+        ResultSet rs = null;
+        String url = "jdbc:mysql://localhost:3306/employee";
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("Enter employee number: ");
+        int empno = scanner.nextInt();
+        try 
+        {
+            conn = DriverManager.getConnection(url, "root", "tnrao");
+            System.out.println("Connection established successfully.");
 
-        // Employee number
-        Int empno = 101;
+            cst = conn.prepareCall("{call p_selnm(?)}");
+            cst.setInt(1, empno);
 
-        Try (Connection conn = DriverManager.getConnection(dbUrl, username, password);
-             CallableStatement cs = conn.prepareCall(“{call get_designation(?, ?)}”)) {
+            boolean hasResults = cst.execute();
 
-            // Set input parameter
-            Cs.setInt(1, empno);
-
-            // Register output parameter
-            Cs.registerOutParameter(2, Types.VARCHAR);
-
-            // Execute the stored procedure
-            Cs.execute();
-
-            // Get output parameter value
-            String designation = cs.getString(2);
-
-            System.out.println(“Designation for employee “ + empno + “: “ + designation);
-        } catch (SQLException e) {
-            System.err.println(“Error retrieving designation: “ + e.getMessage());
+            if (hasResults) 
+            {
+                rs = cst.getResultSet();
+                if (rs.next()) 
+                {
+                    String desig = rs.getString("desig");
+                    System.out.println("Employee's designation is: " + desig);
+                } 
+                else 
+                {
+                    System.out.println("No employee found with number: " + empno);
+                }
+            }
+            rs.close();
+            cst.close();
+            conn.close();
+        } 
+        catch (Exception e) 
+        {
+            e.printStackTrace();
         }
-    } 
+        scanner.close();
+    }
 }
