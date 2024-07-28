@@ -1,32 +1,52 @@
-Import java.sql.*;
+import java.sql.*;
+import java.util.Scanner;
 
-Public class GetEmployeesByDesignation {
-    Public static void main(String[] args) {
-        // Database connection settings
-        String dbUrl = “jdbc:mysql://localhost:3306/your_database”;
-        String username = “your_username”;
-        String password = “your_password”;
+class pro9
+{
+    public static void main(String[] args) 
+    {
+        Connection conn = null;
+        CallableStatement cst = null;
+        ResultSet rs = null;
+        String url = "jdbc:mysql://localhost:3306/employee";
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("Enter employee designation : ");
+        String des = scanner.nextLine();
+        try 
+        {
+            conn = DriverManager.getConnection(url, "root", "tnrao");
+            System.out.println("Connection established successfully.");
 
-        // Get designation from user
-        String designation = “Software Engineer”;
+            cst = conn.prepareCall("{call p_dis(?)}");
+            cst.setString(1, des);
 
-        Try (Connection conn = DriverManager.getConnection(dbUrl, username, password);
-             CallableStatement cs = conn.prepareCall(“{call get_employees_by_designation(?)}”)) {
+            boolean hasResults = cst.execute();
 
-            // Set input parameter
-            Cs.setString(1, designation);
-
-            // Execute the stored procedure
-            ResultSet rs = cs.executeQuery();
-
-            // Display employee records
-            While (rs.next()) {
-                System.out.println(“Empno: “ + rs.getInt(“empno”) +
-                        “, Name: “ + rs.getString(“name”) +
-                        “, Email: “ + rs.getString(“email”));
+            if (hasResults) 
+            {
+                rs = cst.getResultSet();
+                if (rs.next()) 
+                {
+                    int eno = rs.getInt("empno");
+                    System.out.println("empno : " + eno);
+                    String fnm = rs.getString("firstname");
+                    System.out.println("Firstname : " + fnm);
+                    String lnm = rs.getString("lastname");
+                    System.out.println("Lastname : " + lnm);
+                } 
+                else 
+                {
+                    System.out.println("No employee found with this designation : " + des);
+                }
             }
-        } catch (SQLException e) {
-            System.err.println(“Error retrieving employees: “ + e.getMessage());
+            rs.close();
+            cst.close();
+            conn.close();
+        } 
+        catch (Exception e) 
+        {
+            e.printStackTrace();
         }
+        scanner.close();
     }
 }
