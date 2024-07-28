@@ -1,20 +1,29 @@
-Import java.sql.*;
+import java.sql.*;
 
-Public class InsertDefaultEmployee {
-    Public static void main(String[] args) {
-        // Database connection settings
-        String dbUrl = “jdbc:mysql://localhost:3306/your_database”;
-        String username = “Parth Chavda”;
-        String password = “your_password”;
-
-        Try (Connection conn = DriverManager.getConnection(dbUrl, username, password);
-             CallableStatement cs = conn.prepareCall(“{call insert_default_employee()}”)) {
-            // Execute the stored procedure
-            Cs.execute();
-            System.out.println(“Default employee record inserted successfully!”);
-        } catch (SQLException e) {
-            System.err.println(“Error inserting default employee record: “ + e.getMessage());
+class pro6 
+{
+    public static void main(String[] args) 
+    {
+        Connection conn = null;
+        CallableStatement cst = null;
+        String url = "jdbc:mysql://localhost:3306/employee";
+        try
+        {
+            conn = DriverManager.getConnection(url,"root","tnrao");
+            System.out.println("Connection established successfully.");
+            
+            cst = conn.prepareCall("{call p_insert()}");
+            System.out.println("Calling stored procedure...");
+            cst.execute();
+            System.out.println("Record added successfully.");
+            
+            cst.close();
+            conn.close();
+            System.out.println("Connection closed.");
+        } 
+        catch (Exception e) 
+        {
+            e.printStackTrace();    
         }
     }
 }
-
